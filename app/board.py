@@ -1,47 +1,78 @@
-import numpy as np
+# board.py
+# This function builds a martix of the board to use when determining he next move
+# Below is an exmaple of a 5x5 board with nothing on it
+#      0  1  2  3  4  5
+# 0 {[ 1, 1, 1, 1, 1, 1 ]
+# 1  [ 1, 1, 1, 1, 1, 1 ]
+# 2  [ 1, 1, 1, 1, 1, 1 ]
+# 3  [ 1, 1, 1, 1, 1, 1 ]
+# 4  [ 1, 1, 1, 1, 1, 1 ]
+# 5  [ 1, 1, 1, 1, 1, 1 ]}
+#
+#
 
-UNOCCUPIED = 1
-OCCUPIED   = -1
-FOOD       = 1
-HEAD       = -2
+from app.constants import UNOCCUPIED, OCCUPIED, FOOD,HEAD, TAIL
 
 
 
 def update_board(state):
+    # Variables
     height = state["board"]["height"]
-    Matrix = [[UNOCCUPIED for x in range(height)] for y in range(height)]
+    width = state["board"]["width"]
     board_state = state['board']
-    food_coords = board_state['food']
-    snakes = board_state['snakes']
-    my_body = state['you']['body']
+    Matrix = [[UNOCCUPIED for x in range(width)] for y in range(height)]
+    place_food(board_state, Matrix)
+    place_snakes(board_state, Matrix)
+    place_self(state, Matrix)
+    return Matrix
 
+
+# Places all the food on the matrix of the board
+def place_food(board_state, Matrix):
+    food_coords = board_state['food']
     for coord in food_coords:
         Matrix[coord['y']][coord['x']] = FOOD
 
+
+# Loop all the snakes setting the matrix
+# If the snake ate the tail spot is set as occupied
+#
+# Body = UNOCCUPIED
+# Tail = UNOCCUPIED
+# Head = HEAD
+def place_snakes(board_state, Matrix):
+    snakes = board_state['snakes']
     for snake in snakes:
         snake_body = snake['body']
         for coord in snake_body[1:]:
             Matrix[coord['y']][coord['x']] = OCCUPIED
-        Tail_coord = snake_body[len(snake_body)-1]
-        one_coord = snake_body[len(snake_body) - 2]
-        Matrix[Tail_coord['y']][Tail_coord['x']] = UNOCCUPIED
-        if Tail_coord['x'] == one_coord['x'] and Tail_coord['y'] == Tail_coord['y']:
-            Matrix[Tail_coord['y']][Tail_coord['x']] = OCCUPIED
+
+        tail_coord = snake_body[len(snake_body) - 1]
         head_coord = snake_body[0]
+        one_back = snake_body[len(snake_body) - 2]
+
+        if tail_coord['x'] == one_back['x'] and tail_coord['y'] == one_back['y']:
+            Matrix[tail_coord['y']][tail_coord['x']] = OCCUPIED
+        else:
+            Matrix[tail_coord['y']][tail_coord['x']] = UNOCCUPIED
+
         Matrix[head_coord['y']][head_coord['x']] = HEAD
 
+
+# Places your body on the board
+# If the snake ate the tail spot is set as occupied
+#
+# body = OCCUPIED
+# tail = UNOCCUPIED
+def place_self(state, Matrix):
+    my_body = state['you']['body']
     for coord in my_body[0:]:
         Matrix[coord['y']][coord['x']] = OCCUPIED
-    tail = my_body[len(my_body)-1]
+    tail = my_body[len(my_body) - 1]
     oneback = my_body[len(my_body) - 2]
-    Matrix[tail['y']][tail['x']] = 4
-    if state['turn']< 3:
+    if state['turn'] < 3:
         Matrix[tail['y']][tail['x']] = OCCUPIED
-    if tail['x']== oneback['x'] and tail['y'] == oneback['y']:
+    if tail['x'] == oneback['x'] and tail['y'] == oneback['y']:
         Matrix[tail['y']][tail['x']] = OCCUPIED
-
-
-    # print('Updated board state for turn ' + str(state['turn']) + ':\n\n' + str(board) + '\n\n')
-   # for x in range(len(Matrix)):
-   # print(Matrix[x])
-    return Matrix
+    else:
+        Matrix[tail['y']][tail['x']] = UNOCCUPIED
