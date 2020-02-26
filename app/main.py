@@ -40,23 +40,8 @@ def move():
     game_state = bottle.request.json
     new_board = update_board(game_state)
     direction = ""
-    # Change the number of snake_num to change the snake
-    # 1 = random snake
-    # 2 = food snake
-    # 3 = wall snake
-    # 4 = smart snake
-    # 5 = doga snake
- 
-    if snake_num == 1:
-        direction = random_move()
-    if snake_num == 2:
-        direction = food_move(game_state, new_board)
-    if snake_num == 3:
-        direction = wall_move(game_state, new_board)
-    if snake_num == 4:
-        direction = smart_move(game_state, new_board)
-    if snake_num == 5:
-        direction = doga_move(game_state, new_board)
+
+    direction = doga_move(game_state, new_board)
     return move_response(direction)
 
 
