@@ -7,7 +7,7 @@
 from app.wall_snake import wall_move
 from app.food_snake import food_move
 
-HEALTH_LIM = 15 # When the snakes health falls below this value it will search for food
+HEALTH_LIM = 20 # When the snakes health falls below this value it will search for food
 
 # smart_move()
 # This function decides to either to a move to stay alive or hunt for food
